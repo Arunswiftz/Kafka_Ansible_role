@@ -1,0 +1,71 @@
+    - name: Include the list variables
+      include_vars:
+        file: common.yml
+        name: common
+
+    - name: Backup - server.properties file
+      become: yes
+      become_user: "{{ buser }}"
+      lineinfile:
+        path: "{{ installation_dir }}/config/kraft/server.properties" #/opt/kafka/config/kraft/server.properties
+        line: ''
+        state: present
+        backup: yes
+
+    - name: Replacing common contents in server.properties
+      lineinfile:
+        path:  "{{ installation_dir }}/config/kraft/server.properties" #/opt/kafka/config/kraft/server.properties
+        regexp: '{{ item.from }}'
+        line: '{{ item.to}}'
+        state: present
+      with_items: "{{ common.list }}"
+
+    - name: Adding TLS Security Setting & SASL_SSL Authentication setting
+      lineinfile:
+        path: "{{ installation_dir }}/config/kraft/server.properties"
+        line: '{{ item }}'
+      with_items: "{{ common.tls }}"
+
+        #    - name: Update the Java Heap Size for Kafka 1GB - 2GB
+        #      become: yes
+        #      become_user: "{{ buser }}"
+        #      replace:
+        #        path: "{{ installation_dir }}/bin/kafka-server-start.sh"
+        #        regexp: '{{ item.from }}' #'export KAFKA_HEAP_OPTS=(".+")'
+        #        replace: '{{ item.to }}' #'export KAFKA_HEAP_OPTS="-Xmx1G -Xms2G"' #use GB for extension
+        #        backup: yes
+        #      with_items: "{{ common.java}}"
+    - name: Creating template file - server.properties.j2
+      template:
+        src: "{{ installation_dir }}/config/kraft/server.properties"
+        dest: '"{{ fpath }}/{{ user }}/server.properties.j2"'
+
+    - name: final replacement in server.properties.j2
+      replace:
+        path: "{{ fpath }}/{{ user }}/server.properties.j2"
+        regexp: '\['
+        replace: '{'
+
+    - replace:
+        path: "{{ fpath }}/{{ user }}/server.properties.j2"
+        regexp: ']'
+        replace: '}'
+
+
+#-------------------------- end of creating template ------
+
+vars_files:
+    - properties.yml
+
+      #  tasks:
+    - name: Create a properties file for each entry in properties_by_nodes
+      vars:
+        node_id: "{{ item.node_id }}"
+        cqvoters: "{{ item.cqvoters }}"
+        listeners: "{{ item.listeners }}"
+        advertised: "{{ item.advertised }}"
+        log_dir: "{{ item.log_dir }}"
+      ansible.builtin.template:
+        src: "{{ fpath }}/{{ user }}/server.properties.j2" 
+        dest: "/tmp/server{{ node_id }}.properties"
+      loop: "{{ properties_by_nodes }}"

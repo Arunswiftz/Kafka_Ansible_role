@@ -1,0 +1,37 @@
+
+#   - name: Create a properties file for each entry in properties_by_nodes
+#     vars:
+#       node_id: "{{ item.node_id }}"
+#       cqvoters: "{{ item.cqvoters }}"
+#       listeners: "{{ item.listeners }}"
+#       advertised: "{{ item.advertised }}"
+#       log_dir: "{{ item.log_dir }}"
+#-------------------
+    - name: Include the properties_by_nodes list
+      vars_file:
+        properties.yml
+#------------------
+#     tasks: 
+#       - name: creation of servers.properties file
+#         ansible.builtin.template:
+#           src: '"{{ fpath }}/{{ user }}/server.properties.j2"'
+#           dest: "{{ installation_dir }}/config/kraft/server{{ node_id }}.properties"
+#         loop: "{{ properties_by_nodes }}"
+#
+#-------------------------------------------------------
+
+    - name: Create different properties files from variables
+      ansible.builtin.template:
+        src: '"{{ fpath }}/{{ user }}/server.properties.j2"'
+        dest: "/tmp/server{{ item.node_id }}.properties"
+      with_items: "{{ properties_by_nodes }}"
+#-------------------------------
+        #      loop_control:
+        #        loop_var: item
+        #        vars:
+        #          node_id: "{{ item.node_id }}"
+        #         cqvoters: "{{ item.cqvoters }}"
+        #         listeners: "{{ item.listeners }}"
+        #         advertised: "{{ item.advertised }}"
+        #         log_dir: "{{ item.log_dir }}"
+        #       when: properties_by_nodes | length > 0         

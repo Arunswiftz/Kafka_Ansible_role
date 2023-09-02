@@ -1,0 +1,30 @@
+  - name: Install JRE & JDK #dependices for Kafka
+    apt:
+      name: "{{ item }}"
+    loop:
+        - default-jre
+        - default-jdk
+
+  - name: Create a group
+    become: yes
+    group:
+      name: "{{ user }}"
+      state: present
+
+  - name: Create an user
+    become: yes
+    user:
+      name: "{{ user }}"
+      state: present
+      group: "{{ user }}"
+      createhome: true
+      home: "{{ fpath }}/{{ user }}"
+
+  - name: Create a Directory /opt/kafka
+    become: yes
+    file:
+      path: "{{installation_dir}}"
+      state: directory
+      mode: 0755
+      owner: kafka
+      group: kafka

@@ -1,0 +1,39 @@
+---
+list:
+  - from: inter.broker.listener.name=PLAINTEXT
+    to: inter.broker.listener.name=SASL_SSL
+  - from: listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
+    to: listener.security.protocol.map=CONTROLLER:SASL_SSL,SASL_SSL:SASL_SSL,CLIENT:SASL_SSL
+  - from: controller.listener.names=CONTROLLER
+    to: controller.listener.names=CONTROLLER
+  - from: node.id=1
+    to: node.id=[[ node_id ]]
+  - from: controller.quorum.voters=1@localhost:9093
+    to: controller.quorum.voters=[[ cq_voters ]]
+  - from: listeners=PLAINTEXT://:9092,CONTROLLER://:9093
+    to: listeners=[[ listeners ]]
+  - from: advertised.listeners=PLAINTEXT://localhost:9092
+    to: advertised.listeners=[[ advertised ]]
+  - from: log.dirs=/tmp/kraft-combined-logs
+    to: log.dirs=[[ log_dir ]]
+
+
+tls:
+  - '############################# TLS Security Setting #############################'
+  - ssl.keystore.location=/media/sf_ubuntu_share/ssl-new/Broker/broker.jks
+  - ssl.keystore.password=nabilks
+  - ssl.key.password=nabilks
+  - ssl.truststore.location=/media/sf_ubuntu_share/ssl-new/CA/truststore.jks
+  - ssl.truststore.password=nabilks
+  - ssl.client.auth=required
+  - ssl.enabled.protocols=TLSv1.2,TLSv1.3
+  - ssl.truststore.type=JKS
+  - ssl.keystore.type=JKS
+  - ssl.secure.random.implementation=SHA1PRNG
+  - ssl.endpoint.identification.algorithm=
+  - '##############################  SASL_SSL(PLAIN) Authentication setting   ####################'
+  - security.inter.broker.protocol=SASL_SSL
+  - sasl.mechanism.inter.broker.protocol=PLAIN
+  - sasl.enabled.mechanisms=PLAIN
+  - security.protocol:SASL_SSL
+  - sasl.mechanism.controller.protocol=PLAIN

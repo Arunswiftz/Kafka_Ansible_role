@@ -1,0 +1,37 @@
+    - name: Downloading the file
+      become: yes
+      get_url:
+        url: https://downloads.apache.org/kafka/3.5.1/kafka_2.13-3.5.1.tgz
+        dest: "{{ fpath }}/{{ user }}/"
+        mode: 755
+
+    - shell: echo "{{ dwnurl }}" | cut -d "/" -f 6-7
+      register: zipfile
+
+    - set_fact:
+        zfile: "{{ zipfile.stdout }}"
+
+    - name: Extracting the file
+      unarchive:
+        src: "{{ fpath }}/{{ user }}/{{ zfile }}"
+        dest: "{{ fpath }}/{{ user }}"
+        mode: 0755
+        remote_src: yes
+
+    - shell: echo "{{ zfile }}" | cut -d "." -f 1-4
+      register: extractfile
+
+    - set_fact:
+        efile: "{{ extractfile.stdout }}"
+
+    - name: Move all the files to parent Directory
+      become: yes
+      become_user: "{{ buser }}"
+      archive:
+        path: "{{ fpath }}/{{ user }}/{{ efile }}/"
+        dest: "{{ fpath }}/{{ user }}/all.tar"
+        format: tar
+
+    - unarchive:
+        src: "{{ fpath }}/{{ user }}/all.tar"
+        dest: "{{installation_dir}}/"
