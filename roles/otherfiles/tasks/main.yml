@@ -1,0 +1,3 @@
+   - name: Creating Kafka_client_jaas.conf
+     copy:
+       src: :

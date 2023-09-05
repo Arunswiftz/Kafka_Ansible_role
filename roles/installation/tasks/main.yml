@@ -35,3 +35,17 @@
     - unarchive:
         src: "{{ fpath }}/{{ user }}/all.tar"
         dest: "{{installation_dir}}/"
+
+    - name: Backup - Kraft's server.properties file
+      become: yes
+      become_user: "{{ buser }}"
+      shell: "date +%Y-%m-%d-%H-%M-%S"
+      register: stmp
+
+    - name: set-fact
+      set_fact:
+        dt: "{{ stmp.stdout }}"
+        
+    - copy:
+        src: "{{ installation_dir }}/config/kraft/server.properties"
+        dest: "{{ installation_dir }}/config/kraft/server.properties{{ dt }}" 

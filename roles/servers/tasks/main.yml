@@ -7,9 +7,9 @@
 #       advertised: "{{ item.advertised }}"
 #       log_dir: "{{ item.log_dir }}"
 #-------------------
-    - name: Include the properties_by_nodes list
-      vars_file:
-        properties.yml
+#    - name: Include the properties_by_nodes list
+#      vars_file:
+#        properties.yml
 #------------------
 #     tasks: 
 #       - name: creation of servers.properties file
@@ -19,12 +19,12 @@
 #         loop: "{{ properties_by_nodes }}"
 #
 #-------------------------------------------------------
-
-    - name: Create different properties files from variables
-      ansible.builtin.template:
-        src: '"{{ fpath }}/{{ user }}/server.properties.j2"'
-        dest: "/tmp/server{{ item.node_id }}.properties"
-      with_items: "{{ properties_by_nodes }}"
+#
+#    - name: Create different properties files from variables
+#      ansible.builtin.template:
+#        src: '"{{ fpath }}/{{ user }}/server.properties.j2"'
+#        dest: "/tmp/server{{ item.node_id }}.properties"
+#      with_items: "{{ properties_by_nodes }}"
 #-------------------------------
         #      loop_control:
         #        loop_var: item
@@ -34,4 +34,36 @@
         #         listeners: "{{ item.listeners }}"
         #         advertised: "{{ item.advertised }}"
         #         log_dir: "{{ item.log_dir }}"
-        #       when: properties_by_nodes | length > 0         
+        #       when: properties_by_nodes | length > 0        
+        #
+#------------------------ working content ------------------------
+    - name: Include the list variables
+      include_vars:
+        file: properties.yml
+        name: properties
+    
+    - name: Creating Kafka folder in /tmp
+      file: 
+        path: /tmp/kafka/logs
+        state: directory
+
+    - name: Create a properties file for each entry in properties_by_nodes
+      vars:
+        node_id: "{{ item.node_id }}"
+        cqvoters: "{{ item.cqvoters }}"
+        listeners: "{{ item.listeners }}"
+        advertised: "{{ item.advertised }}"
+        log_dir: "{{ item.log_dir }}"
+      template:
+        src: "{{ fpath }}/{{ user }}/server.properties.j2"
+        dest: "/tmp/kafka/server{{ node_id }}.properties"
+      loop: "{{ properties.properties_by_nodes }}" 
+
+    - name: creating log folder for Kafka servers
+      vars:
+        node_id: "{{ item.node_id }}"
+      file:
+        path: "/tmp/kafka/logs/server{{ node_id }}/kraft-combined-logs"
+        state: directory
+      with_items: "{{ properties.properties_by_nodes }}"
+

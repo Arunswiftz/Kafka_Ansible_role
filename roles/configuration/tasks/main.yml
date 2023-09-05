@@ -2,15 +2,19 @@
       include_vars:
         file: common.yml
         name: common
-
-    - name: Backup - server.properties file
-      become: yes
-      become_user: "{{ buser }}"
-      lineinfile:
-        path: "{{ installation_dir }}/config/kraft/server.properties" #/opt/kafka/config/kraft/server.properties
-        line: ''
-        state: present
-        backup: yes
+    
+          #    - name: Backup - Kraft's server.properties file      
+          #      become: yes
+          #      become_user: "{{ buser }}"
+        #      shell: "date +%Y-%m-%d-%H-%M-%S"
+        #      register: stmp
+  
+        #   - name: set-fact
+        #     set_fact:
+        #       dt: "{{ stmp.stdout }}"
+        #copy:
+        #       src: "{{ installation_dir }}/config/kraft/server.properties"
+        #       dest: "{{ installation_dir }}/config/kraft/server.properties{{ date +%Y-%m-%d-%H-%M }}"      
 
     - name: Replacing common contents in server.properties
       lineinfile:
@@ -54,18 +58,3 @@
 
 #-------------------------- end of creating template ------
 
-vars_files:
-    - properties.yml
-
-      #  tasks:
-    - name: Create a properties file for each entry in properties_by_nodes
-      vars:
-        node_id: "{{ item.node_id }}"
-        cqvoters: "{{ item.cqvoters }}"
-        listeners: "{{ item.listeners }}"
-        advertised: "{{ item.advertised }}"
-        log_dir: "{{ item.log_dir }}"
-      ansible.builtin.template:
-        src: "{{ fpath }}/{{ user }}/server.properties.j2" 
-        dest: "/tmp/server{{ node_id }}.properties"
-      loop: "{{ properties_by_nodes }}"
