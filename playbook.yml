@@ -28,3 +28,9 @@
   gather_facts: false
   roles:
     - servers
+
+- hosts: localhost
+  become: true
+  gather_facts: true
+  roles:
+    - otherfiles

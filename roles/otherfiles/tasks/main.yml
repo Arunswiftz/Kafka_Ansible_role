@@ -1,3 +1,42 @@
-   - name: Creating Kafka_client_jaas.conf
+   - name: Creating kafka_client_jaas.conf & kafka_server_jass.conf #inside the kraft folder
      copy:
-       src: :
+       src: "{{ item }}"
+       dest: "{{ installation_dir }}/config/kraft"
+     with_items:
+       - kafka_server_jaas.conf
+       - kafka_client_jaas.conf
+
+   - name: Including vars_file
+     include_vars:
+       file: config.yml
+       name: config
+
+   - name: Implementing changes to Kafka's consumer.properties
+     lineinfile:
+       path: "{{ installation_dir }}/config/consumer.properties" #/opt/kafka/config/kraft/server.properties
+       regexp: '{{ item.from }}'
+       line: '{{ item.to}}'
+       state: present
+     with_items:
+        - "{{ config.consumer }}"
+
+   - name: including the TLS and SASL_SSL settings in consumer.properties
+     lineinfile:
+       path: "{{ installation_dir }}/config/consumer.properties" 
+       line: '{{ item }}'
+     with_items: "{{ config.c_tls }}"
+
+   - name: Implementing changes to Kafka's producer.properties
+     lineinfile:
+       path: "{{ installation_dir }}/config/producer.properties" #/opt/kafka/config/kraft/server.properties
+       regexp: '{{ item.from }}'
+       line: '{{ item.to}}'
+       state: present
+     with_items:
+        - "{{ config.producer }}"
+
+   - name: including the TLS and SASL_SSL settings in producer.properties
+     lineinfile:
+       path: "{{ installation_dir }}/config/producer.properties"
+       line: '{{ item }}'
+     with_items: "{{ config.p_tls }}"

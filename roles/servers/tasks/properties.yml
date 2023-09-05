@@ -18,20 +18,3 @@ properties_by_nodes:
     advertised: SASL_SSL://web.example.com:18082
     log_dir: /tmp/kafka/logs/server3/kraft-combined-logs
 
-  - node_id: 4
-    cqvoters: 1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082
-    listeners: SASL_SSL://web.example.com:18083,CONTROLLER://web.example.com:8083
-    advertised: SASL_SSL://web.example.com:18083
-    log_dir: /tmp/kafka/logs/server4/kraft-combined-logs
-
-  - node_id: 5
-    cqvoters: 1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082
-    listeners: SASL_SSL://web.example.com:18084,CONTROLLER://web.example.com:8084
-    advertised: SASL_SSL://web.example.com:18084
-    log_dir: /tmp/kafka/logs/server5/kraft-combined-logs
-
-  - node_id: 6
-    cqvoters: 1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082
-    listeners: SASL_SSL://web.example.com:18085,CONTROLLER://web.example.com:8085
-    advertised: SASL_SSL://web.example.com:18085
-    log_dir: /tmp/kafka/logs/server6/kraft-combined-logs

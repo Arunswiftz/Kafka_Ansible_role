@@ -56,14 +56,14 @@
         log_dir: "{{ item.log_dir }}"
       template:
         src: "{{ fpath }}/{{ user }}/server.properties.j2"
-        dest: "/tmp/kafka/server{{ node_id }}.properties"
+        dest: "{{ installation_dir }}/config/kraft/server{{ node_id }}.properties"
       loop: "{{ properties.properties_by_nodes }}" 
 
     - name: creating log folder for Kafka servers
       vars:
         node_id: "{{ item.node_id }}"
       file:
-        path: "/tmp/kafka/logs/server{{ node_id }}/kraft-combined-logs"
+        path: "{{ installation_dir }}/logs/server{{ node_id }}/kraft-combined-logs"
         state: directory
       with_items: "{{ properties.properties_by_nodes }}"
 

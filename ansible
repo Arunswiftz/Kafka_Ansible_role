@@ -1,0 +1,182 @@
+
+PLAY [Installing Kafka on Ubuntu] **********************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+PLAY [localhost] ***************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [prerequisite : Install JRE & JDK] ****************************************
+ok: [localhost] => (item=default-jre)
+ok: [localhost] => (item=default-jdk)
+
+TASK [prerequisite : Create a group] *******************************************
+ok: [localhost]
+
+TASK [prerequisite : Create an user] *******************************************
+ok: [localhost]
+
+TASK [prerequisite : Create a Directory /opt/kafka] ****************************
+ok: [localhost]
+
+PLAY [localhost] ***************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [installation : Downloading the file] *************************************
+ok: [localhost]
+
+TASK [installation : shell] ****************************************************
+changed: [localhost]
+
+TASK [installation : set_fact] *************************************************
+ok: [localhost]
+
+TASK [installation : Extracting the file] **************************************
+ok: [localhost]
+
+TASK [installation : shell] ****************************************************
+changed: [localhost]
+
+TASK [installation : set_fact] *************************************************
+ok: [localhost]
+
+TASK [installation : Move all the files to parent Directory] *******************
+ok: [localhost]
+
+TASK [installation : unarchive] ************************************************
+changed: [localhost]
+
+TASK [installation : Backup - Kraft's server.properties file] ******************
+changed: [localhost]
+
+TASK [installation : set-fact] *************************************************
+ok: [localhost]
+
+TASK [installation : copy] *****************************************************
+changed: [localhost]
+
+PLAY [localhost] ***************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [configuration : Include the list variables] ******************************
+ok: [localhost]
+
+TASK [configuration : Replacing common contents in server.properties] **********
+changed: [localhost] => (item={'from': 'listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL', 'to': 'listener.security.protocol.map=CONTROLLER:SASL_SSL,SASL_SSL:SASL_SSL,CLIENT:SASL_SSL'})
+ok: [localhost] => (item={'from': 'controller.listener.names=CONTROLLER', 'to': 'controller.listener.names=CONTROLLER'})
+changed: [localhost] => (item={'from': 'node.id=1', 'to': 'node.id=[[ node_id ]]'})
+changed: [localhost] => (item={'from': 'controller.quorum.voters=1@localhost:9093', 'to': 'controller.quorum.voters=[[ cqvoters ]]'})
+changed: [localhost] => (item={'from': 'listeners=PLAINTEXT://:9092,CONTROLLER://:9093', 'to': 'listeners=[[ listeners ]]'})
+changed: [localhost] => (item={'from': 'advertised.listeners=PLAINTEXT://localhost:9092', 'to': 'advertised.listeners=[[ advertised ]]'})
+changed: [localhost] => (item={'from': 'log.dirs=/tmp/kraft-combined-logs', 'to': 'log.dirs=[[ log_dir ]]'})
+
+TASK [configuration : Adding TLS Security Setting & SASL_SSL Authentication setting] ***
+changed: [localhost] => (item=############################# TLS Security Setting #############################)
+changed: [localhost] => (item=ssl.keystore.location=/path/of/saved/keystore/broker.jks)
+changed: [localhost] => (item=ssl.keystore.password=password)
+changed: [localhost] => (item=ssl.key.password=password)
+changed: [localhost] => (item=ssl.truststore.location=/path/of/saved/trustore/truststore.jks)
+changed: [localhost] => (item=ssl.truststore.password=password)
+changed: [localhost] => (item=ssl.client.auth=required)
+changed: [localhost] => (item=ssl.enabled.protocols=TLSv1.2,TLSv1.3)
+changed: [localhost] => (item=ssl.truststore.type=JKS)
+changed: [localhost] => (item=ssl.keystore.type=JKS)
+changed: [localhost] => (item=ssl.secure.random.implementation=SHA1PRNG)
+changed: [localhost] => (item=ssl.endpoint.identification.algorithm=)
+changed: [localhost] => (item=##############################  SASL_SSL(PLAIN) Authentication setting   ####################)
+changed: [localhost] => (item=security.inter.broker.protocol=SASL_SSL)
+changed: [localhost] => (item=sasl.mechanism.inter.broker.protocol=PLAIN)
+changed: [localhost] => (item=sasl.enabled.mechanisms=PLAIN)
+changed: [localhost] => (item=security.protocol:SASL_SSL)
+changed: [localhost] => (item=sasl.mechanism.controller.protocol=PLAIN)
+changed: [localhost] => (item=listener.name.sasl_ssl.plain.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \ username="otheruser" \ password="password" \)
+
+TASK [configuration : Creating template file - server.properties.j2] ***********
+changed: [localhost]
+
+TASK [configuration : final replacement in server.properties.j2] ***************
+changed: [localhost]
+
+TASK [configuration : replace] *************************************************
+changed: [localhost]
+
+PLAY [localhost] ***************************************************************
+
+TASK [servers : Include the list variables] ************************************
+ok: [localhost]
+
+TASK [servers : Creating Kafka folder in /tmp] *********************************
+ok: [localhost]
+
+TASK [servers : Create a properties file for each entry in properties_by_nodes] ***
+ok: [localhost] => (item={'node_id': 1, 'cqvoters': '1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082', 'listeners': 'SASL_SSL://web.example.com:18080,CONTROLLER://web.example.com:8080', 'advertised': 'SASL_SSL://web.example.com:18080', 'log_dir': '/tmp/kafka/logs/server1/kraft-combined-logs'})
+ok: [localhost] => (item={'node_id': 2, 'cqvoters': '1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082', 'listeners': 'SASL_SSL://web.example.com:18081,CONTROLLER://web.example.com:8081', 'advertised': 'SASL_SSL://web.example.com:18081', 'log_dir': '/tmp/kafka/logs/server2/kraft-combined-logs'})
+ok: [localhost] => (item={'node_id': 3, 'cqvoters': '1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082', 'listeners': 'SASL_SSL://web.example.com:18082,CONTROLLER://web.example.com:8082', 'advertised': 'SASL_SSL://web.example.com:18082', 'log_dir': '/tmp/kafka/logs/server3/kraft-combined-logs'})
+
+TASK [servers : creating log folder for Kafka servers] *************************
+ok: [localhost] => (item={'node_id': 1, 'cqvoters': '1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082', 'listeners': 'SASL_SSL://web.example.com:18080,CONTROLLER://web.example.com:8080', 'advertised': 'SASL_SSL://web.example.com:18080', 'log_dir': '/tmp/kafka/logs/server1/kraft-combined-logs'})
+ok: [localhost] => (item={'node_id': 2, 'cqvoters': '1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082', 'listeners': 'SASL_SSL://web.example.com:18081,CONTROLLER://web.example.com:8081', 'advertised': 'SASL_SSL://web.example.com:18081', 'log_dir': '/tmp/kafka/logs/server2/kraft-combined-logs'})
+ok: [localhost] => (item={'node_id': 3, 'cqvoters': '1@web.example.com:8080,2@web.example.com:8081,3@web.example.com:8082', 'listeners': 'SASL_SSL://web.example.com:18082,CONTROLLER://web.example.com:8082', 'advertised': 'SASL_SSL://web.example.com:18082', 'log_dir': '/tmp/kafka/logs/server3/kraft-combined-logs'})
+
+PLAY [localhost] ***************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [otherfiles : Creating kafka_client_jaas.conf & kafka_server_jass.conf] ***
+ok: [localhost] => (item=kafka_server_jaas.conf)
+ok: [localhost] => (item=kafka_client_jaas.conf)
+
+TASK [otherfiles : Including vars_file] ****************************************
+ok: [localhost]
+
+TASK [otherfiles : Implementing changes to Kafka's consumer.properties] ********
+changed: [localhost] => (item={'from': 'bootstrap.servers=localhost:9092', 'to': 'bootstrap.servers=web.example.com:8080,web.example.com:8081,web.example.com:8082'})
+changed: [localhost] => (item={'from': 'group.id=test-consumer-group', 'to': 'group.id=ssl-consumer'})
+
+TASK [otherfiles : including the TLS and SASL_SSL settings in consumer.properties] ***
+changed: [localhost] => (item=###################   TLS/SSL Encryption Settings  ############################)
+changed: [localhost] => (item=# security.protocol=SSL)
+changed: [localhost] => (item=ssl.keystore.location=/path/to/client.jks)
+changed: [localhost] => (item=ssl.keystore.password=)
+changed: [localhost] => (item=ssl.key.password=)
+changed: [localhost] => (item=ssl.truststore.location=/path/to/truststore.jks)
+changed: [localhost] => (item=ssl.truststore.password=)
+changed: [localhost] => (item=ssl.enabled.protocols=TLSv1.2,TLSv1.3)
+changed: [localhost] => (item=producer.ssl.endpoint.identification.algorithm=)
+changed: [localhost] => (item=###################  SASL_SSL(PLAIN) Authentication Setting   ####################)
+changed: [localhost] => (item=security.protocol=SASL_SSL)
+changed: [localhost] => (item=# Configure SASL_SSL if SSL encryption is enabled, otherwise configure SASL_PLAINTEXT)
+changed: [localhost] => (item=sasl.mechanism=PLAIN)
+changed: [localhost] => (item=listener.name.SASL_SSL.PLAIN.sasl.jaas.config=-Djava.security.auth.login.config=/opt/kafka/config/kraft/kafka_client_jaas.conf)
+
+TASK [otherfiles : Implementing changes to Kafka's producer.properties] ********
+changed: [localhost] => (item={'from': 'bootstrap.servers=localhost:9092', 'to': 'bootstrap.servers=web.example.com:8080,web.example.com:8081,web.example.com:8082'})
+ok: [localhost] => (item={'from': 'compression.type=none', 'to': 'compression.type=none'})
+
+TASK [otherfiles : including the TLS and SASL_SSL settings in producer.properties] ***
+changed: [localhost] => (item=###################   TLS/SSL Encryption Settings  ############################)
+changed: [localhost] => (item=# security.protocol=SSL)
+changed: [localhost] => (item=ssl.keystore.location=/path/to/client.jks)
+changed: [localhost] => (item=ssl.keystore.password=)
+changed: [localhost] => (item=ssl.key.password=)
+changed: [localhost] => (item=ssl.truststore.location=/path/to/truststore.jks)
+changed: [localhost] => (item=ssl.truststore.password=)
+changed: [localhost] => (item=ssl.enabled.protocols=TLSv1.2,TLSv1.3)
+changed: [localhost] => (item=producer.ssl.endpoint.identification.algorithm=)
+changed: [localhost] => (item=###################  SASL_SSL(PLAIN) Authentication Setting   ####################)
+changed: [localhost] => (item=security.protocol=SASL_SSL)
+changed: [localhost] => (item=# Configure SASL_SSL if SSL encryption is enabled, otherwise configure SASL_PLAINTEXT)
+changed: [localhost] => (item=sasl.mechanism=PLAIN)
+changed: [localhost] => (item=listener.name.SASL_SSL.PLAIN.sasl.jaas.config=-Djava.security.auth.login.config=/opt/kafka/config/kraft/kafka_server_jaas.conf)
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=36   changed=14   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

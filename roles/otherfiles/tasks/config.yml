@@ -1,0 +1,49 @@
+---
+consumer:
+  - from: bootstrap.servers=localhost:9092
+    to: bootstrap.servers=web.example.com:8080,web.example.com:8081,web.example.com:8082
+  - from: group.id=test-consumer-group
+    to: group.id=ssl-consumer
+          
+producer:
+  - from: bootstrap.servers=localhost:9092
+    to: bootstrap.servers=web.example.com:8080,web.example.com:8081,web.example.com:8082
+  - from: compression.type=none
+    to: compression.type=none
+
+p_tls:
+
+  - '###################   TLS/SSL Encryption Settings  ############################'
+  - '# security.protocol=SSL'
+  - ssl.keystore.location=/path/to/client.jks
+  - ssl.keystore.password=
+  - ssl.key.password=
+  - ssl.truststore.location=/path/to/truststore.jks
+  - ssl.truststore.password=
+  - ssl.enabled.protocols=TLSv1.2,TLSv1.3
+  - producer.ssl.endpoint.identification.algorithm=
+
+  - '###################  SASL_SSL(PLAIN) Authentication Setting   ####################'
+  - security.protocol=SASL_SSL
+  - '# Configure SASL_SSL if SSL encryption is enabled, otherwise configure SASL_PLAINTEXT'
+  - sasl.mechanism=PLAIN
+  - listener.name.SASL_SSL.PLAIN.sasl.jaas.config=-Djava.security.auth.login.config=/opt/kafka/config/kraft/kafka_server_jaas.conf
+
+c_tls:
+
+  - '###################   TLS/SSL Encryption Settings  ############################'
+  - '# security.protocol=SSL'
+  - ssl.keystore.location=/path/to/client.jks
+  - ssl.keystore.password=
+  - ssl.key.password=
+  - ssl.truststore.location=/path/to/truststore.jks
+  - ssl.truststore.password=
+  - ssl.enabled.protocols=TLSv1.2,TLSv1.3
+  - producer.ssl.endpoint.identification.algorithm=
+
+  - '###################  SASL_SSL(PLAIN) Authentication Setting   ####################'
+  - security.protocol=SASL_SSL
+  - '# Configure SASL_SSL if SSL encryption is enabled, otherwise configure SASL_PLAINTEXT'
+  - sasl.mechanism=PLAIN
+  - listener.name.SASL_SSL.PLAIN.sasl.jaas.config=-Djava.security.auth.login.config=/opt/kafka/config/kraft/kafka_client_jaas.conf
+
