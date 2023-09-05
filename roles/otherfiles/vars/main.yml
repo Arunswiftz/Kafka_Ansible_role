@@ -1,0 +1,7 @@
+---
+dwnurl: https://downloads.apache.org/kafka/3.5.1/kafka_2.13-3.5.1.tgz
+user: kafka
+fpath: /home
+installation_dir : /opt/kafka
+buser: root
+
