@@ -1,0 +1,11 @@
+    - name: Creating Cluster ID
+      shell: "{{ installation_dir }}/bin/kafka-storage.sh random-uuid"
+      register: cluster_id
+
+    - set_fact:
+        id: "{{ cluster_id.stdout }}"
+
+    - shell: "{{ installation_dir }}/bin/kafka-storage.sh format -t {{ id }} -c {{ installation_dir }}/config/kraft/server.properties --ignore-formatted"
+
+    - shell: "{{ installation_dir }}/bin/kafka-server-start.sh {{ installation_dir }}/config/kraft/server.properties"
+
